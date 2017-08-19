@@ -1,0 +1,1 @@
+java -jar GetTicWatchData1.jar
