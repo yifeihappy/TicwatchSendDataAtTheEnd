@@ -2,27 +2,34 @@ package com.dyf;
 
 
 import java.io.FileWriter;
-import java.io.IOException;  
+import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;  
 import java.net.Socket;  
   
 public class MyServer {  
       
-    private static final int PORT = 5000; //spy on the port 5000  
+    private static final int PORT = 5100; //spy on the port 5000  
     
-    FileWriter accelrometerFile;//加速度传感器
-    FileWriter gyroscopeFile;//陀螺仪
-    FileWriter gravityFile;//重力传感器
-    FileWriter magnetFile;//磁场感应传感器
+    FileWriter dataFile;
     
     void initMyserver() {  
         try {  
             ServerSocket serverSocket = new ServerSocket(PORT);  
-              
-            accelrometerFile = new FileWriter("accelrometer.txt");
-            gyroscopeFile = new FileWriter("gyroscope.txt");
-            gravityFile = new FileWriter("gravity.txt");
-            magnetFile = new FileWriter("magnet.txt");
+            dataFile = new FileWriter("sensorData.txt");
+            
+            InetAddress ia = null;
+            try{
+            	ia = ia.getLocalHost();
+            	String localname = ia.getHostName();
+            	String localip = ia.getHostAddress();
+            	System.out.println("鏈満鍚嶇О鏄細"+localname);
+            	System.out.println("鏈満鐨刬p鏄細"+localip);
+            } catch (Exception e) {
+				// TODO: handle exception
+            	System.out.println(e);
+            	return;
+			}
             System.out.println("Server start......");  
             while(true) {  
 
@@ -34,41 +41,20 @@ public class MyServer {
               
                 //build a thread to deal with the socket  
                 //Thread thread = new Thread(new ServerThread(socket));  
-                Thread thread = new Thread(new ServerThread(socket,accelrometerFile,
-                		gyroscopeFile, gravityFile,magnetFile));
+                Thread thread = new Thread(new ServerThread(socket,dataFile));
                 thread.start();  
             }  
         } catch (IOException e) {  
             // TODO: handle exception  
+        	System.out.println(e);
         }  
         
         try {
-        	accelrometerFile.flush();
-			accelrometerFile.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        try{
-        	gravityFile.flush();
-        	gravityFile.close();
-        } catch (Exception e) {
+			dataFile.flush();
+			dataFile.close();
+		} catch (Exception e) {
 			// TODO: handle exception
-			e.printStackTrace();
-		}
-        try{
-        	magnetFile.flush();
-        	magnetFile.close();
-        } catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
-		}
-        try{
-        	gyroscopeFile.flush();
-        	gyroscopeFile.close();
-        } catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
+			System.out.println(e);
 		}
     }  
     public static void main(String[] args) {  
